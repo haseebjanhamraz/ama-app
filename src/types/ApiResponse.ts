@@ -6,3 +6,11 @@ export interface ApiResponse {
   isAcceptingMessages?: boolean;
   messages?: Array<Message>
 };
+
+
+export interface CowApiResponse {
+  tag: string;
+  breed: string;
+  dob: Date;
+  isAvailable: boolean
+};
