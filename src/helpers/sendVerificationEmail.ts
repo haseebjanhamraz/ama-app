@@ -9,11 +9,12 @@ export async function sendVerificationEmail(
 ): Promise<ApiResponse> {
   try {
     await resend.emails.send({
-      from: 'dev@hiteshchoudhary.com',
+      from: 'next@resend.saplay.pk',
       to: email,
-      subject: 'Mystery Message Verification Code',
+      subject: 'Saplay Verification Code',
       react: VerificationEmail({ username, otp: verifyCode }),
     });
+    console.log("Email sent successfully")
     return { success: true, message: 'Verification email sent successfully.' };
   } catch (emailError) {
     console.error('Error sending verification email:', emailError);

@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
+import { User } from 'next-auth';
 
 export async function POST(request: Request) {
   // Connect to the database
@@ -8,13 +9,15 @@ export async function POST(request: Request) {
   try {
     const { username, code } = await request.json();
     const decodedUsername = decodeURIComponent(username);
-    const user = await UserModel.findOne({ username: decodedUsername });
+    console.log(typeof (decodedUsername))
+    const user = await UserModel.findOne({ username: decodedUsername }).exec()
 
     if (!user) {
+      console.log("User not found")
       return Response.json(
         { success: false, message: 'User not found' },
         { status: 404 }
-      );
+      )
     }
 
     // Check if the code is correct and not expired
@@ -32,6 +35,7 @@ export async function POST(request: Request) {
       );
     } else if (!isCodeNotExpired) {
       // Code has expired
+      console.log("Code has expired!!!")
       return Response.json(
         {
           success: false,
@@ -41,6 +45,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     } else {
+      console.log("Code is invalid")
       // Code is incorrect
       return Response.json(
         { success: false, message: 'Incorrect verification code' },
