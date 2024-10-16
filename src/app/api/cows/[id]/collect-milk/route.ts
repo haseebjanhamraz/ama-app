@@ -1,11 +1,14 @@
 import dbConnect from '@/lib/dbConnect';
-import CowModel, { Cow } from '@/model/Cow';
+import MilkModel, { Milk } from '@/model/Milk';
+
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/options';
+import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 import { User } from 'next-auth';
 
-export async function POST(request: Request) {
+
+export async function POST(request: Request, { params }: { params: { id: string } }) {
     await dbConnect();
+    const { id } = params
     // const session = await getServerSession(authOptions);
     // const user: User = session?.user;
     // if (!session || !session.user) {
@@ -15,15 +18,20 @@ export async function POST(request: Request) {
     //     );
     // }
     try {
-        const { tag, breed, sex, dob, isMilking, isAvailable } = await request.json();
-        const cow = new CowModel({ tag, breed, sex, dob, isMilking, isAvailable });
-        await cow.save();
-        console.log("Cow Added", cow)
+        const { date, shift, quantity } = await request.json();
+        const milk = new MilkModel({
+            cowId: id,
+            date,
+            shift,
+            quantity,
+        });
+        await milk.save();
+        console.log("Milk Record Added", milk)
         return Response.json(
             {
                 success: true,
-                message: 'Cow added successfully',
-                cow: cow,
+                message: 'Milk record added successfully',
+                data: milk
             },
             { status: 201 }
         );
@@ -35,7 +43,8 @@ export async function POST(request: Request) {
         );
     }
 }
-export async function GET(request: Request) {
+
+export async function GET(request: Request, { params }: { params: { id: string } }) {
     await dbConnect();
     // const session = await getServerSession(authOptions);
     // const user: User = session?.user;
@@ -46,21 +55,23 @@ export async function GET(request: Request) {
     //     );
     // }
     try {
-        const cows = await CowModel.find().exec();
+        const { id } = params
+        const milk = await MilkModel.find({ cowId: id }).exec();
+        console.log("Milk Record Retrieved for", id)
         return Response.json(
             {
                 success: true,
-                message: 'Cow retrieved successfully',
-                cows: cows,
+                message: `Milk record for cow: ${id}`,
+                data: milk
+
             },
             { status: 201 }
         );
     } catch (error) {
+        console.error(error);
         return Response.json(
-            { success: false, message: 'Error loading cows' },
+            { success: false, message: 'Error retrieving cow milk record' },
             { status: 500 }
         );
     }
-
-
 }

@@ -1,18 +1,17 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import MilkModel, { Milk } from './Milk';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 
 export interface Cow extends Document {
   tag: string;
   breed: string;
+  sex: string;
   dob: Date;
-  isAvailable: boolean
-  // milkRecord: Milk[]
+  isMilking: boolean;
+  isAvailable: boolean;
 }
 
 
-
-const CowSchema: Schema<Cow> = new mongoose.Schema({
+const CowSchema: Schema = new mongoose.Schema({
   tag: {
     type: String,
     required: [true, 'Tag is required'],
@@ -22,7 +21,10 @@ const CowSchema: Schema<Cow> = new mongoose.Schema({
   breed: {
     type: String,
     required: [true, 'Breed is required'],
-    unique: true,
+  },
+  sex: {
+    type: String,
+    required: [true, 'Sex is required'],
   },
   dob: {
     type: Date,
@@ -32,13 +34,10 @@ const CowSchema: Schema<Cow> = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  // milkRecord: [MilkModel],
-
-
 });
 
-const CowModel =
-  (mongoose.models.Cow as mongoose.Model<Cow>) ||
-  mongoose.model<Cow>('Cow', CowSchema);
+// Correctly define the model
+const CowModel: Model<Cow> =
+  mongoose.models.Cow || mongoose.model<Cow>('Cow', CowSchema);
 
 export default CowModel;
